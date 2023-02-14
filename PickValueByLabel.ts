@@ -18,10 +18,23 @@ type LabelValue = {
 type Data = NoReadonly<typeof data>
 
 type Child<T> = T extends Array<infer R extends LabelValue>
-  ? { [P in R['label']]: R['value'] }
+  ? { [P in R['label']]: PickValueByLabel<T, R, P> }
+  : never
+
+type PickValueByLabel<
+  D extends T[],
+  T extends LabelValue,
+  L extends T['label']
+> = D extends Array<infer R>
+  ? R extends T
+    ? L extends R['label']
+      ? R['value']
+      : never
+    : never
   : never
 
 const child = data.map((v) => [v.label, v.value])
 const obj = Object.fromEntries(child) as Child<Data>
 
-console.log(obj.a)
+console.log(obj.b)
+
